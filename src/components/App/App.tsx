@@ -1,60 +1,48 @@
 import { useState } from "react";
-import CafeInfo from "../CafeInfo/CafeInfo.tsx";
-import css from "./App.module.css";
-import type { Votes, VoteType } from "../../types/types.ts";
-import VoteOptions from "../VoteOptions/VoteOptions.tsx";
-import VoteStats from "../VoteStats/VoteStats.tsx";
-import Notification from "../Notification/Notification.tsx";
+import toast, { Toaster } from "react-hot-toast";
+// import ErrorMessage from "../ErrorMessage/ErrorMessage.tsx";
+// import Loader from "../Loader/Loader";
+import SearchBar from "../SearchBar/SearchBar";
+import fetchMovies from "../../services/movieService";
+import type { Movie } from "../../types/movie";
+
+import style from "./App.module.css";
 
 
-export default function App() {
-
-    const [votes, setVotes] = useState<Votes>({
-        good: 0,
-        neutral: 0,
-        bad: 0,
-    });
-
-    const totalVotes = votes.good + votes.neutral + votes.bad;
-    const canReset = totalVotes > 0;
-    const positiveRate = totalVotes
-        ? Math.round((votes.good / totalVotes) * 100)
-        : 0;
+export default function App() { 
+    const [movies, setMovies] = useState<Movie[]>([]);
+    // const [isLoader, setIsLoader] = useState(false);
+    // const [isError, setIsError] = useState(false);
 
 
-    const handleVote = (key: VoteType) => {
-        setVotes({
-            ...votes,
-            [key]: votes[key] + 1,
-        });
-    }
+    const handleSearch = async (query: string) => {
 
-    const handleResetVotes = () => {
-        setVotes({
-        good: 0,
-        neutral: 0,
-        bad: 0,
-        });
+        setMovies([]);
+
+        try {
+            const results = await fetchMovies({ query });
+            if (results.length === 0) {
+                toast("No movies found for your request.");
+            } else {
+                setMovies(results);
+            }
+        } catch {
+            toast.error("There was an error, please try again...");
+        }
     };
+    
 
     return (
-        <div className={css.app}>
-            <div className={css.container}>
-                <CafeInfo /> 
-                <VoteOptions
-                    onVote={handleVote}
-                    onReset={handleResetVotes}
-                    canReset={canReset}
-                />
-                {totalVotes > 0 ? <VoteStats
-                    votes={votes}
-                    totalVotes={totalVotes}
-                    positiveRate={positiveRate}
-                /> : 
-                    <Notification />
-                }
-           </div>
-        </div>);
+        <div className={style.wrapper}>
+            <SearchBar onSubmit={handleSearch} />
+            {/* {movie && <MovieGrid/>} */}
+            <ul>
+               {movies.map(movie => (
+                 <li key={movie.id}>{movie.title}</li>
+               ))}
+            </ul>
+
+        <Toaster />
+        </div>
+    )
 }
-
-
