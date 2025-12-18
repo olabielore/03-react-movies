@@ -5,7 +5,7 @@ const TMDB_TOKEN = import.meta.env.VITE_TMDB_TOKEN;
 
 const  BASE_URL = "https://api.themoviedb.org/3";
 
-interface ApiProps {
+interface movieServiceProps {
   query: string;
   page?: number;
 }
@@ -14,7 +14,7 @@ interface MoviesResponse {
   results: Movie[];
 }
 
-export default async function fetchMovies({ query, page} : ApiProps): Promise<Movie[]> {
+export default async function fetchMovies({ query, page} : movieServiceProps): Promise<Movie[]> {
   const config = {
     params: {
       query,
