@@ -14,7 +14,7 @@ export default function MovieGrid({ onSelect, movies }: MovieGridProps) {
     return (
         <ul className={css.grid}>
                {movies.map(movie => (
-                 <li key={movie.id}>{movie.title}
+                 <li key={movie.id}>
               <div className={css.card} onClick={() => onSelect(movie)}>
                 <img 
                     className={css.image} 
